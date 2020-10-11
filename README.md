@@ -6,7 +6,7 @@ What is the goal of the project?
 
 - Server Files - of course the main thing here would be getting rid of most of the small bugs, but also it would be very important to implement some kind of server-side protection againts tbl edits, koxp etc. Also updating the files to include many features that are missing from v1298 files like fully working events like Border Defence War, Juraid Mountain, Chaos Match, Wars, Castle Siege War etc.
 
-- Database - mostly it would be fixing existing items/npc/monsters correcting wrong procedures & creating missing tables to match the server files along with the client.
+- Database - mostly it would be fixing existing items/npc/monsters correcting wrong procedures & creating missing tables to match the server files along with the client.
 
 - Client - as we are using official USKO client most of the things are fixed, there will be of course couple addons we will need to implement like 'Pathos Gloves' & 'Bags' slots in inventory for cospre items but it will be mostly small polishes around the edges.
 
