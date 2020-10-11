@@ -16,6 +16,6 @@ What is the goal of the project?
 
 How can I contribute to the project?
 
-I am aware that many of the developers from our community aren't skilled C/C++ programmers but it's not an issue, with this project we are aiming to make it long-term developement project so everyone can learn and profit (when it comes to knowledge). So even if you aren't  C++ programmer we will need a lot of other skills, like web-design, UI developers, database developers etc. Everyone is welcome to contribute!
+I am aware that many of the developers from our community aren't skilled C/C++ programmers but it's not an issue, with this project we are aiming to make it long-term developement project so everyone can learn and profit (when it comes to knowledge). So even if you aren't  C++ programmer we will need a lot of other skills, like web-design, UI developers, database developers etc. Everyone is welcome to contribute!
 
 The main respository will be hosted on KO4Life account so everyone can fork it and work individually but contribute to whole project with pull requests which will be revised by us (project developers) and decided if created update is valid and needed in our project.
