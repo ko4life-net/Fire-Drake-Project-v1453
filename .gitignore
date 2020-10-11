@@ -1,0 +1,7 @@
+.vs/
+.vscode/
+Debug/
+Release/
+build*/
+
+*.sdf
