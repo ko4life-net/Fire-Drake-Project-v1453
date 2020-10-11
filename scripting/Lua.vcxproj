@@ -40,10 +40,12 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(SolutionDir)..\Server Files\</OutDir>
+    <OutDir>$(SolutionDir)build\bin\$(PlatformTarget)-$(Configuration)\libs\</OutDir>
+    <IntDir>$(SolutionDir)build\obj\$(PlatformTarget)-$(Configuration)\libs\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(SolutionDir)..\bin\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)build\bin\$(PlatformTarget)-$(Configuration)\libs\</OutDir>
+    <IntDir>$(SolutionDir)build\obj\$(PlatformTarget)-$(Configuration)\libs\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

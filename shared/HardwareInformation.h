@@ -2,6 +2,7 @@
 
 #include "stdafx.h"
 #include <Iphlpapi.h>
+#include <intrin.h>
 
 #pragma comment(lib, "iphlpapi.lib")
 
