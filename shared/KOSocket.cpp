@@ -25,6 +25,8 @@ void KOSocket::OnConnect()
 void KOSocket::OnRead() 
 {
 	Packet pkt;
+	std::recursive_mutex m_lock;
+	Guard Lock(m_lock);
 
 	for (;;) 
 	{
@@ -139,23 +141,27 @@ bool KOSocket::DecryptPacket(uint8 *in_stream, Packet & pkt)
 
 bool KOSocket::Send(Packet * pkt) 
 {
-	if (!IsConnected() || pkt->size() + 1 > GetWriteBuffer().GetAllocatedSize())
+	if (!IsConnected()
+		|| pkt->size() + 7 > MAX_PACKET_SEND_SIZE)
 		return false;
 
-	bool r;
+	WSABUF buf;
+	DWORD w_length = 0;
+	DWORD flags = 0;
+	BYTE out_stream[MAX_PACKET_SEND_SIZE];
+	BYTE Final_Packet[MAX_PACKET_SEND_SIZE];
+	uint32 Final_Size = 0;
+	memset(out_stream, 0x00, MAX_PACKET_SEND_SIZE);
+	memset(Final_Packet, 0x00, MAX_PACKET_SEND_SIZE);
 
-	uint8 opcode = pkt->GetOpcode();
-	uint8 * out_stream = nullptr;
 	uint16 len = (uint16)(pkt->size() + 1);
 
 	if (isCryptoEnabled())
 	{
 		len += 5;
 
-		out_stream = new uint8[len];
-
-		*(uint16 *)&out_stream[0] = 0x1efc;
-		*(uint16 *)&out_stream[2] = (uint16)(m_sequence); // this isn't actually incremented here
+		*(uint16*)&out_stream[0] = 0x1efc;
+		*(uint16*)&out_stream[2] = (uint16)(m_sequence); // this isn't actually incremented here
 		out_stream[4] = 0;
 		out_stream[5] = pkt->GetOpcode();
 
@@ -166,34 +172,32 @@ bool KOSocket::Send(Packet * pkt)
 	}
 	else
 	{
-		out_stream = new uint8[len];
 		out_stream[0] = pkt->GetOpcode();
 		if (pkt->size() > 0)
 			memcpy(&out_stream[1], pkt->contents(), pkt->size());
 	}
 
-	BurstBegin();
+	memcpy(&Final_Packet[Final_Size], (const uint8*)"\xaa\x55", 2);		Final_Size += 2;
+	memcpy(&Final_Packet[Final_Size], (const uint8*)&len, 2);			Final_Size += 2;
+	memcpy(&Final_Packet[Final_Size], (const uint8*)out_stream, len);	Final_Size += len;
+	memcpy(&Final_Packet[Final_Size], (const uint8*)"\x55\xaa", 2);		Final_Size += 2;
 
-	if (GetWriteBuffer().GetSpace() < size_t(len + 6))
-	{
-		BurstEnd();
-		Disconnect();
-		return false;
-	}
+	// attempt to push all the data out in a non-blocking fashion.
+	buf.len = (ULONG)Final_Size;
+	buf.buf = (char*)Final_Packet;
 
-	r = BurstSend((const uint8*)"\xaa\x55", 2);
-	if (r) r = BurstSend((const uint8*)&len, 2);
-	if (r) r = BurstSend((const uint8*)out_stream, len);
-	if (r) r = BurstSend((const uint8*)"\x55\xaa", 2);
-	if (r) BurstPush();
-	BurstEnd();
-
-	delete [] out_stream;
+	m_writeEvent.Mark();
+	m_writeEvent.Reset(NUM_SOCKET_IO_EVENTS);
+	bool r = WSASend(m_fd, &buf, 1, &w_length, flags, &m_writeEvent.m_overlap, NULL);
+	m_writeEvent.Unmark();
 	return r;
 }
 
 bool KOSocket::SendCompressed(Packet * pkt) 
 {
+	if (!IsConnected())
+		return false;
+
 	if (pkt->size() < 500)
 		return Send(pkt);
 
