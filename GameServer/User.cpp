@@ -456,7 +456,7 @@ bool CUser::HandlePacket(Packet & pkt)
 		break;
 	case WIZ_LOGOSSHOUT:
 		LogosShout(pkt);
-
+		break;
 	default:
 		TRACE("[SID=%d] Unknown packet %X\n", GetSocketID(), command);
 		return false;
@@ -1199,27 +1199,49 @@ void CUser::SendPremiumInfo()
 */
 void CUser::RequestUserIn(Packet & pkt)
 {
+	uint16 sReqUserCount = pkt.read<uint16>();
+
+	if (sReqUserCount > 1000)
+		sReqUserCount = 1000;
+
 	Packet result(WIZ_REQ_USERIN);
-	short user_count = pkt.read<uint16>(), online_count = 0;
-	if (user_count > 1000)
-		user_count = 1000;
+	size_t wpos = result.wpos();
 
-	result << uint16(0); // placeholder for user count
+	uint16 sUserCount = 0;
+	result << sUserCount;
 
-	for (int i = 0; i < user_count; i++)
+	for (int i = 0; i < sReqUserCount; i++)
 	{
 		CUser *pUser = g_pMain->GetUserPtr(pkt.read<uint16>());
-		if (pUser == nullptr || !pUser->isInGame())
+		if (pUser == nullptr
+			|| pUser == this
+			|| !pUser->isInGame()
+			|| pUser->isGM()
+			|| pUser->GetZoneID() != GetZoneID())
+			continue;
+
+		if (GetEventRoom() >= 0
+			&& pUser->GetEventRoom() != GetEventRoom())
 			continue;
 
 		result << uint8(0) << pUser->GetSocketID();
 		pUser->GetUserInfo(result);
+		++sUserCount;
 
-		online_count++;
+		if (sReqUserCount > 0
+			&& sUserCount >= MAX_SEND_USERID)
+			break;
+
+		if (60000 > 0
+			&& result.size() >= 60000)
+			break;
 	}
 
-	result.put(0, online_count); // substitute count in
-	SendCompressed(&result);
+	if (sUserCount > 0)
+	{
+		result.put(wpos, sUserCount);
+		SendCompressed(&result);
+	}
 }
 
 /**

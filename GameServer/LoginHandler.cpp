@@ -35,7 +35,7 @@ void CUser::LoginProcess(Packet & pkt)
 	CUser * pUser = g_pMain->GetUserPtr(strAccountID, TYPE_ACCOUNT);
 	char *cstr = &strAccountID[0];
 
-	if (!WordGuardSystem(cstr, strlen(cstr)))
+	if (!WordGuardSystem(cstr, (uint8)strlen(cstr)))
 		goto fail_return;
 
 	if (pUser && (pUser->GetSocketID() != GetSocketID()))

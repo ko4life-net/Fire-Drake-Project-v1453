@@ -264,4 +264,4 @@ uint8 CUser::GetMonsterChallengeTime()
 	return 0;
 }
 
-uint8 CUser::GetMonsterChallengeUserCount() { return g_pMain->m_nForgettenTempleUsers.size(); }
+uint8 CUser::GetMonsterChallengeUserCount() { return (uint8)g_pMain->m_nForgettenTempleUsers.size(); }

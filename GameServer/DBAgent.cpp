@@ -1806,7 +1806,7 @@ void CDBAgent::UpdateCandidacyNoticeBoard(string & strCharID, uint8 byNation, st
 
 	// Field is 1024 bytes in the database.
 	uint8 strBinaryNotice[1024] = {0};
-	uint16 sNoticeLen = strNotice.length();
+	uint16 sNoticeLen = (uint16)strNotice.length();
 
 	// This shouldn't happen, but... in the horribly unlikely event it does... we're ready.
 	if (sNoticeLen > sizeof(strBinaryNotice))
