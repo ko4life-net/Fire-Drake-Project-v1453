@@ -15,10 +15,6 @@ extern "C"
 // Allow up to 30 minutes for the player to create their character / the client to load.
 #define KOSOCKET_LOADING_TIMEOUT (30 * 60)
 
-#define MAX_PACKET_SEND_BUFFER (1024 * 16)
-#define MAX_PACKET_RECV_BUFFER (1024 * 8)
-#define MAX_PACKET_SEND_SIZE (1024 * 16)
-
 class KOSocket : public Socket
 {
 public:
