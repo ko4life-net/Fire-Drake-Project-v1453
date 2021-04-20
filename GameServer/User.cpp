@@ -9,7 +9,7 @@
 
 using namespace std;
 
-CUser::CUser(uint16 socketID, SocketMgr *mgr) : KOSocket(socketID, mgr, -1, 16384, 3172), Unit(UnitPlayer)
+CUser::CUser(uint16 socketID, SocketMgr *mgr) : KOSocket(socketID, mgr, -1, MAX_PACKET_SEND_BUFFER, MAX_PACKET_RECV_BUFFER), Unit(UnitPlayer)
 {
 }
 
