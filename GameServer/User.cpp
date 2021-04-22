@@ -2944,50 +2944,23 @@ void CUser::AppendNoticeEntry(Packet & pkt, uint8 & elementCount, const char * m
 void CUser::AppendExtraNoticeData(Packet & pkt, uint8 & elementCount)
 {
 	string message;
-			if (g_pMain->m_byExpEventAmount < 1000)
-	{
-		g_pMain->GetServerResource(IDS_BAR5, &message, g_pMain->m_byExpEventAmount);
-		AppendNoticeEntry(pkt, elementCount, message.c_str(), "Knight Online 2.0"); 
-	}
-			if (g_pMain->m_byExpEventAmount < 1000)
-	{
-		g_pMain->GetServerResource(IDS_BAR1, &message, g_pMain->m_byExpEventAmount);
-		AppendNoticeEntry(pkt, elementCount, message.c_str(), "Fire Drake"); 
-	}
-			if (g_pMain->m_byExpEventAmount < 1000)
-	{
-		g_pMain->GetServerResource(IDS_BAR2, &message, g_pMain->m_byExpEventAmount);
-		AppendNoticeEntry(pkt, elementCount, message.c_str(), "Bifrost"); 
-	}
-			if (g_pMain->m_byExpEventAmount < 1000)
-	{
-		g_pMain->GetServerResource(IDS_BAR3, &message, g_pMain->m_byExpEventAmount);
-		AppendNoticeEntry(pkt, elementCount, message.c_str(), "Border Defance War"); 
-	}
-			if (g_pMain->m_byExpEventAmount < 1000)
-	{
-		g_pMain->GetServerResource(IDS_BAR4, &message, g_pMain->m_byExpEventAmount);
-		AppendNoticeEntry(pkt, elementCount, message.c_str(), "Juraid Mountain"); 
-	}
-
-			if (g_pMain->m_byExpEventAmount > 0)
+	if (g_pMain->m_byExpEventAmount > 0)
 	{
 		g_pMain->GetServerResource(IDS_EXP_REPAY_EVENT, &message, g_pMain->m_byExpEventAmount);
-		AppendNoticeEntry(pkt, elementCount, message.c_str(), "Exp Event"); 
+		AppendNoticeEntry(pkt, elementCount, message.c_str(), "EXP Event");
 	}
 
-			if (g_pMain->m_byCoinEventAmount > 0)
+	if (g_pMain->m_byCoinEventAmount > 0)
 	{
 		g_pMain->GetServerResource(IDS_MONEY_REPAY_EVENT, &message, g_pMain->m_byCoinEventAmount);
-		AppendNoticeEntry(pkt, elementCount, message.c_str(), "Noah Event"); 
+		AppendNoticeEntry(pkt, elementCount, message.c_str(), "Noah Event");
 	}
 
-			if (g_pMain->m_byNPEventAmount > 0)
+	if (g_pMain->m_byNPEventAmount > 0)
 	{
 		g_pMain->GetServerResource(IDS_NP_REPAY_EVENT, &message, g_pMain->m_byNPEventAmount);
-		AppendNoticeEntry(pkt, elementCount, message.c_str(), "NP Event"); 
+		AppendNoticeEntry(pkt, elementCount, message.c_str(), "NP Event");
 	}
-
 }
 
 void CUser::SkillPointChange(Packet & pkt)
