@@ -3,13 +3,16 @@
 //
 //	Defines About Communication
 //
-#define MAX_SOCKET					100
-#define MAX_PATH_LINE		100
+#define MAX_SOCKET				100
+#define MAX_PATH_LINE			100
 
-#define MAX_NPC_SIZE		30
+#define MAX_NPC_SIZE			30
+#define MAX_SEND_USERID			10
+#define MAX_SEND_NPCID			100
+
 #define MAX_WEAPON_NAME_SIZE	40
-#define VIEW_DIST			48		// 가시거리
-#define MAX_UPGRADE_WEAPON	12
+#define VIEW_DIST				48		// 가시거리
+#define MAX_UPGRADE_WEAPON		12
 
 //enum MOVE_SPEED {SPEED_SLOW=0, SPEED_NORMAL, SPEED_FAST};
 //enum USER_TYPE {TYPE_USER=0, TYPE_MONSTER, TYPE_NPC, TYPE_DOOR, TYPE_GUARD};

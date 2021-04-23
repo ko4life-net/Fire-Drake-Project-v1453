@@ -9,7 +9,7 @@
 
 using namespace std;
 
-CUser::CUser(uint16 socketID, SocketMgr *mgr) : KOSocket(socketID, mgr, -1, 16384, 3172), Unit(UnitPlayer)
+CUser::CUser(uint16 socketID, SocketMgr *mgr) : KOSocket(socketID, mgr, -1, MAX_PACKET_SEND_BUFFER, MAX_PACKET_RECV_BUFFER), Unit(UnitPlayer)
 {
 }
 
@@ -456,7 +456,7 @@ bool CUser::HandlePacket(Packet & pkt)
 		break;
 	case WIZ_LOGOSSHOUT:
 		LogosShout(pkt);
-
+		break;
 	default:
 		TRACE("[SID=%d] Unknown packet %X\n", GetSocketID(), command);
 		return false;
@@ -1199,27 +1199,49 @@ void CUser::SendPremiumInfo()
 */
 void CUser::RequestUserIn(Packet & pkt)
 {
+	uint16 sReqUserCount = pkt.read<uint16>();
+
+	if (sReqUserCount > 1000)
+		sReqUserCount = 1000;
+
 	Packet result(WIZ_REQ_USERIN);
-	short user_count = pkt.read<uint16>(), online_count = 0;
-	if (user_count > 1000)
-		user_count = 1000;
+	size_t wpos = result.wpos();
 
-	result << uint16(0); // placeholder for user count
+	uint16 sUserCount = 0;
+	result << sUserCount;
 
-	for (int i = 0; i < user_count; i++)
+	for (int i = 0; i < sReqUserCount; i++)
 	{
 		CUser *pUser = g_pMain->GetUserPtr(pkt.read<uint16>());
-		if (pUser == nullptr || !pUser->isInGame())
+		if (pUser == nullptr
+			|| pUser == this
+			|| !pUser->isInGame()
+			|| pUser->isGM()
+			|| pUser->GetZoneID() != GetZoneID())
+			continue;
+
+		if (GetEventRoom() >= 0
+			&& pUser->GetEventRoom() != GetEventRoom())
 			continue;
 
 		result << uint8(0) << pUser->GetSocketID();
 		pUser->GetUserInfo(result);
+		++sUserCount;
 
-		online_count++;
+		if (sReqUserCount > 0
+			&& sUserCount >= MAX_SEND_USERID)
+			break;
+
+		if (60000 > 0
+			&& result.size() >= 60000)
+			break;
 	}
 
-	result.put(0, online_count); // substitute count in
-	SendCompressed(&result);
+	if (sUserCount > 0)
+	{
+		result.put(wpos, sUserCount);
+		SendCompressed(&result);
+	}
 }
 
 /**
@@ -2922,50 +2944,23 @@ void CUser::AppendNoticeEntry(Packet & pkt, uint8 & elementCount, const char * m
 void CUser::AppendExtraNoticeData(Packet & pkt, uint8 & elementCount)
 {
 	string message;
-			if (g_pMain->m_byExpEventAmount < 1000)
-	{
-		g_pMain->GetServerResource(IDS_BAR5, &message, g_pMain->m_byExpEventAmount);
-		AppendNoticeEntry(pkt, elementCount, message.c_str(), "Knight Online 2.0"); 
-	}
-			if (g_pMain->m_byExpEventAmount < 1000)
-	{
-		g_pMain->GetServerResource(IDS_BAR1, &message, g_pMain->m_byExpEventAmount);
-		AppendNoticeEntry(pkt, elementCount, message.c_str(), "Fire Drake"); 
-	}
-			if (g_pMain->m_byExpEventAmount < 1000)
-	{
-		g_pMain->GetServerResource(IDS_BAR2, &message, g_pMain->m_byExpEventAmount);
-		AppendNoticeEntry(pkt, elementCount, message.c_str(), "Bifrost"); 
-	}
-			if (g_pMain->m_byExpEventAmount < 1000)
-	{
-		g_pMain->GetServerResource(IDS_BAR3, &message, g_pMain->m_byExpEventAmount);
-		AppendNoticeEntry(pkt, elementCount, message.c_str(), "Border Defance War"); 
-	}
-			if (g_pMain->m_byExpEventAmount < 1000)
-	{
-		g_pMain->GetServerResource(IDS_BAR4, &message, g_pMain->m_byExpEventAmount);
-		AppendNoticeEntry(pkt, elementCount, message.c_str(), "Juraid Mountain"); 
-	}
-
-			if (g_pMain->m_byExpEventAmount > 0)
+	if (g_pMain->m_byExpEventAmount > 0)
 	{
 		g_pMain->GetServerResource(IDS_EXP_REPAY_EVENT, &message, g_pMain->m_byExpEventAmount);
-		AppendNoticeEntry(pkt, elementCount, message.c_str(), "Exp Event"); 
+		AppendNoticeEntry(pkt, elementCount, message.c_str(), "EXP Event");
 	}
 
-			if (g_pMain->m_byCoinEventAmount > 0)
+	if (g_pMain->m_byCoinEventAmount > 0)
 	{
 		g_pMain->GetServerResource(IDS_MONEY_REPAY_EVENT, &message, g_pMain->m_byCoinEventAmount);
-		AppendNoticeEntry(pkt, elementCount, message.c_str(), "Noah Event"); 
+		AppendNoticeEntry(pkt, elementCount, message.c_str(), "Noah Event");
 	}
 
-			if (g_pMain->m_byNPEventAmount > 0)
+	if (g_pMain->m_byNPEventAmount > 0)
 	{
 		g_pMain->GetServerResource(IDS_NP_REPAY_EVENT, &message, g_pMain->m_byNPEventAmount);
-		AppendNoticeEntry(pkt, elementCount, message.c_str(), "NP Event"); 
+		AppendNoticeEntry(pkt, elementCount, message.c_str(), "NP Event");
 	}
-
 }
 
 void CUser::SkillPointChange(Packet & pkt)

@@ -1859,7 +1859,7 @@ fail_return:
 			Unit *pTmp = (pSkillCaster->isPlayer() ? pSkillCaster : pTarget);
 			int16 sDataCopy[] = 
 			{
-				sData[0], bResult, sData[2], sDuration,
+				sData[0], bResult, sData[2], (int16)sDuration,
 				sData[4], pType->bSpeed, sData[6]
 			};
 

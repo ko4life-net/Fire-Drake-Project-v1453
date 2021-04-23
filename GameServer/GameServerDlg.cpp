@@ -1127,7 +1127,7 @@ void CGameServerDlg::UpdateGameTime()
 
 		// Player Ranking Rewards
 		std::list<std::string> vargs = StrSplit(m_sPlayerRankingsRewardZones, ",");
-		uint8 nZones = vargs.size();
+		uint8 nZones = (uint8)vargs.size();
 		if (nZones > 0)
 		{
 			uint8 nZoneID = 0;
@@ -1786,7 +1786,7 @@ void CGameServerDlg::BattleZoneOpenTimer()
 	if (!isWarOpen() && nMin == 0)
 	{
 		std::list<std::string> vargs = StrSplit(m_sBattleZoneOpenDays, ",");
-		uint8 nDaySize = vargs.size();
+		uint8 nDaySize = (uint8)vargs.size();
 		if (nDaySize > 0)
 		{
 			uint8 nDay = 0;
